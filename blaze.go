@@ -1,9 +1,12 @@
 package blaze
 
 import (
+	"errors"
 	"fmt"
 	"time"
 )
+
+var errNoSteps = errors.New("steps is not defined")
 
 type ExecuteFunc func() (interface{}, error)
 
@@ -71,6 +74,10 @@ func New(conf *Config) *Blaze {
 
 // Do is a main method for executing
 func (b *Blaze) Do() error {
+	err := b.checkConfig()
+	if err != nil {
+		return err
+	}
 	ticker := time.NewTicker(1 * time.Second)
 	go func() {
 		for t := range ticker.C {
@@ -80,5 +87,15 @@ func (b *Blaze) Do() error {
 	}()
 	time.Sleep(b.duration)
 	ticker.Stop()
+	return nil
+}
+
+// checkConfig provides checking of required
+// arguments on config
+func (b *Blaze) checkConfig() error {
+
+	if len(b.steps) == 0 {
+		return errNoSteps
+	}
 	return nil
 }
