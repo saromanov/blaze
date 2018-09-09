@@ -15,8 +15,8 @@ type Blaze struct {
 	steps    []BlazeStep
 }
 
-// BlazeConfig provides configuration for the Blaze
-type BlazeConfig struct {
+// Config provides configuration for the Blaze
+type Config struct {
 	MainExec ExecuteFunc
 	Steps    []BlazeStep
 	Duration time.Duration
@@ -61,7 +61,7 @@ if err != nil {
 	fmt.Fatal("unable to pass test")
 }
 */
-func (b *Blaze) NewBlaze(conf *BlazeConfig) *Blaze {
+func New(conf *Config) *Blaze {
 	return &Blaze{
 		mainExec: conf.MainExec,
 		steps:    conf.Steps,
