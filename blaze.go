@@ -15,9 +15,11 @@ type Blaze struct {
 	steps    []BlazeStep
 }
 
+// BlazeConfig provides configuration for the Blaze
 type BlazeConfig struct {
 	MainExec ExecuteFunc
 	Steps    []BlazeStep
+	Duration time.Duration
 }
 
 // BlazeStep implements step
@@ -28,6 +30,7 @@ type BlazeStep struct {
 }
 
 /*
+Example of using
 
 type Method struct {
 	Url string
@@ -43,8 +46,8 @@ func (m *Method) Execute() {
 
 url := "https://www.google.ru"
 b := NewBlaze(&BlazeConfig {
-	duration: 1 * time.Minute,
-	steps: []BlazeStep {
+	Duration: 1 * time.Minute,
+	Steps: []BlazeStep {
 		Name: "First Step"
 		Duration: 10 * time.Second,
 		Execuite: func()(interface{}, error ) {
@@ -62,9 +65,11 @@ func (b *Blaze) NewBlaze(conf *BlazeConfig) *Blaze {
 	return &Blaze{
 		mainExec: conf.MainExec,
 		steps:    conf.Steps,
+		duration: conf.Duration,
 	}
 }
 
+// Do is a main method for executing
 func (b *Blaze) Do() error {
 	ticker := time.NewTicker(1 * time.Second)
 	go func() {
