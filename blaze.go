@@ -30,6 +30,11 @@ type BlazeStep struct {
 	Name     string
 	Duration time.Duration
 	Execute  ExecuteFunc
+	executed bool
+}
+
+func (s *BlazeStep) updateExecuted() {
+	s.executed = true
 }
 
 /*
@@ -78,10 +83,18 @@ func (b *Blaze) Do() error {
 	if err != nil {
 		return err
 	}
+	startTime := time.Now()
 	ticker := time.NewTicker(1 * time.Second)
 	go func() {
 		for t := range ticker.C {
-			fmt.Println(t)
+			for i, s := range b.steps {
+				fmt.Println(t, s)
+				seconds := time.Since(startTime).Seconds()
+				if !s.executed && seconds > s.Duration.Seconds() {
+					s.Execute()
+					b.steps[i].updateExecuted()
+				}
+			}
 			b.mainExec()
 		}
 	}()
