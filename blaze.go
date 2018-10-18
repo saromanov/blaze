@@ -8,6 +8,8 @@ import (
 
 var errNoSteps = errors.New("steps is not defined")
 
+// ExecuteFunc defines type for the execution func
+// on test
 type ExecuteFunc func() (interface{}, error)
 
 // Blaze implemenths the basic method
