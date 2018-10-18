@@ -3,6 +3,7 @@ package blaze
 import (
 	"errors"
 	"fmt"
+	"sync"
 	"time"
 )
 
@@ -35,9 +36,12 @@ type BlazeStep struct {
 	Duration time.Duration
 	Execute  ExecuteFunc
 	executed bool
+	m        *sync.RWMutex
 }
 
 func (s *BlazeStep) updateExecuted() {
+	s.m.RLock()
+	defer s.m.Unlock()
 	s.executed = true
 }
 
