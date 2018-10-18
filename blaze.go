@@ -19,7 +19,7 @@ type Blaze struct {
 	timeout   time.Time
 	duration  time.Duration
 	tickEvery time.Duration
-	steps     []Step
+	steps     []step
 }
 
 // Config provides configuration for the Blaze
@@ -35,11 +35,18 @@ type Step struct {
 	Name     string
 	Duration time.Duration
 	Execute  ExecuteFunc
+}
+
+// Step implements step
+type step struct {
+	Name     string
+	Duration time.Duration
+	Execute  ExecuteFunc
 	executed bool
 	m        *sync.RWMutex
 }
 
-func (s *Step) updateExecuted() {
+func (s *step) updateExecuted() {
 	s.m.RLock()
 	defer s.m.Unlock()
 	s.executed = true
