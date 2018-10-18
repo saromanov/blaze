@@ -12,17 +12,19 @@ type ExecuteFunc func() (interface{}, error)
 
 // Blaze implemenths the basic method
 type Blaze struct {
-	mainExec ExecuteFunc
-	timeout  time.Time
-	duration time.Duration
-	steps    []BlazeStep
+	mainExec  ExecuteFunc
+	timeout   time.Time
+	duration  time.Duration
+	tickEvery time.Duration
+	steps     []BlazeStep
 }
 
 // Config provides configuration for the Blaze
 type Config struct {
-	MainExec ExecuteFunc
-	Steps    []BlazeStep
-	Duration time.Duration
+	MainExec  ExecuteFunc
+	TickEvery time.Duration
+	Steps     []BlazeStep
+	Duration  time.Duration
 }
 
 // BlazeStep implements step
@@ -71,9 +73,10 @@ if err != nil {
 */
 func New(conf *Config) *Blaze {
 	return &Blaze{
-		mainExec: conf.MainExec,
-		steps:    conf.Steps,
-		duration: conf.Duration,
+		mainExec:  conf.MainExec,
+		steps:     conf.Steps,
+		duration:  conf.Duration,
+		tickEvery: conf.TickEvery,
 	}
 }
 
@@ -84,7 +87,7 @@ func (b *Blaze) Do() error {
 		return err
 	}
 	startTime := time.Now()
-	ticker := time.NewTicker(1 * time.Second)
+	ticker := time.NewTicker(b.tickEvery)
 	go func() {
 		for t := range ticker.C {
 			for i, s := range b.steps {
