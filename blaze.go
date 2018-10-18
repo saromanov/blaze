@@ -37,6 +37,15 @@ type Step struct {
 	Execute  ExecuteFunc
 }
 
+func (s *Step) makeStep() step {
+	return step{
+		Name:     s.Name,
+		Duration: s.Duration,
+		Execute:  s.Execute,
+		m:        &sync.RWMutex{},
+	}
+}
+
 // Step implements step
 type step struct {
 	Name     string
@@ -85,9 +94,13 @@ if err != nil {
 }
 */
 func New(conf *Config) *Blaze {
+	steps := make([]step, len(conf.Steps))
+	for i, s := range conf.Steps {
+		steps[i] = s.makeStep()
+	}
 	return &Blaze{
 		mainExec:  conf.MainExec,
-		steps:     conf.Steps,
+		steps:     steps,
 		duration:  conf.Duration,
 		tickEvery: conf.TickEvery,
 	}
