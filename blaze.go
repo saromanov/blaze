@@ -57,7 +57,7 @@ type step struct {
 
 func (s *step) updateExecuted() {
 	s.m.RLock()
-	defer s.m.Unlock()
+	defer s.m.RUnlock()
 	s.executed = true
 }
 
