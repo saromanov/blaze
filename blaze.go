@@ -19,19 +19,19 @@ type Blaze struct {
 	timeout   time.Time
 	duration  time.Duration
 	tickEvery time.Duration
-	steps     []BlazeStep
+	steps     []Step
 }
 
 // Config provides configuration for the Blaze
 type Config struct {
 	MainExec  ExecuteFunc
 	TickEvery time.Duration
-	Steps     []BlazeStep
+	Steps     []Step
 	Duration  time.Duration
 }
 
-// BlazeStep implements step
-type BlazeStep struct {
+// Step implements step
+type Step struct {
 	Name     string
 	Duration time.Duration
 	Execute  ExecuteFunc
@@ -39,7 +39,7 @@ type BlazeStep struct {
 	m        *sync.RWMutex
 }
 
-func (s *BlazeStep) updateExecuted() {
+func (s *Step) updateExecuted() {
 	s.m.RLock()
 	defer s.m.Unlock()
 	s.executed = true
@@ -63,7 +63,7 @@ func (m *Method) Execute() {
 url := "https://www.google.ru"
 b := NewBlaze(&BlazeConfig {
 	Duration: 1 * time.Minute,
-	Steps: []BlazeStep {
+	Steps: []Step {
 		Name: "First Step"
 		Duration: 10 * time.Second,
 		Execuite: func()(interface{}, error ) {
