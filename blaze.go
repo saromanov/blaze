@@ -53,6 +53,7 @@ type step struct {
 	Execute  ExecuteFunc
 	executed bool
 	m        *sync.RWMutex
+	order    int
 }
 
 func (s *step) updateExecuted() {
@@ -97,6 +98,7 @@ func New(conf *Config) *Blaze {
 	steps := make([]step, len(conf.Steps))
 	for i, s := range conf.Steps {
 		steps[i] = s.makeStep()
+		steps[i].order = i
 	}
 	return &Blaze{
 		mainExec:  conf.MainExec,
@@ -112,6 +114,7 @@ func (b *Blaze) Do() error {
 	if err != nil {
 		return err
 	}
+	fmt.Println(b.steps)
 	startTime := time.Now()
 	ticker := time.NewTicker(b.tickEvery)
 	go func() {
