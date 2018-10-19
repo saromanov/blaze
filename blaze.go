@@ -122,19 +122,19 @@ func (b *Blaze) Do() error {
 	go func() {
 		for t := range ticker.C {
 			for i, s := range b.steps {
-				fmt.Println("STEP:", t, s)
-				if !s.started {
+				started := b.steps[i].started
+				fmt.Println("STEP:", t, s, started)
+				if !started {
 					b.steps[i].started = true
 					b.steps[i].startTime = time.Now()
 				}
-				seconds := time.Since(s.startTime).Seconds()
-				if seconds > s.Duration.Seconds() {
+				seconds := time.Since(b.steps[i].startTime).Seconds()
+				if b.steps[i].started && seconds > s.Duration.Seconds() {
 					b.steps[i].executed = true
 				}
 				fmt.Println("SEconds: ", s.started, s.startTime, s.Duration.Seconds() < seconds)
 				if !s.executed && seconds > s.Duration.Seconds() {
 					s.Execute()
-					b.steps[i].updateExecuted()
 				}
 				continue
 			}
