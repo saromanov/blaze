@@ -48,13 +48,14 @@ func (s *Step) makeStep() step {
 
 // Step implements step
 type step struct {
-	Name     string
-	Duration time.Duration
-	Execute  ExecuteFunc
-	executed bool
-	m        *sync.RWMutex
-	order    int
-	started  bool
+	Name      string
+	Duration  time.Duration
+	Execute   ExecuteFunc
+	executed  bool
+	m         *sync.RWMutex
+	order     int
+	started   bool
+	startTime time.Time
 }
 
 func (s *step) updateExecuted() {
@@ -122,6 +123,9 @@ func (b *Blaze) Do() error {
 		for t := range ticker.C {
 			for i, s := range b.steps {
 				fmt.Println(t, s)
+				if !s.started {
+					s.started = true
+				}
 				seconds := time.Since(startTime).Seconds()
 				if !s.executed && seconds > s.Duration.Seconds() {
 					s.Execute()
