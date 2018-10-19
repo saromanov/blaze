@@ -56,6 +56,7 @@ type step struct {
 	order     int
 	started   bool
 	startTime time.Time
+	endTime   time.Time
 }
 
 func (s *step) updateExecuted() {
@@ -98,9 +99,13 @@ if err != nil {
 */
 func New(conf *Config) *Blaze {
 	steps := make([]step, len(conf.Steps))
+	startTime := time.Now()
 	for i, s := range conf.Steps {
 		steps[i] = s.makeStep()
 		steps[i].order = i
+		steps[i].startTime = startTime
+		startTime = startTime.Add(steps[i].Duration)
+		steps[i].endTime = startTime
 	}
 	return &Blaze{
 		mainExec:  conf.MainExec,
@@ -123,16 +128,15 @@ func (b *Blaze) Do() error {
 		for t := range ticker.C {
 			for i, s := range b.steps {
 				fmt.Println("STEP:", t, s, b.steps[i].started)
-				if !b.steps[i].started {
-					b.steps[i].started = true
-					b.steps[i].startTime = time.Now()
-				}
 				seconds := time.Since(b.steps[i].startTime).Seconds()
-				if b.steps[i].started && seconds > b.steps[i].Duration.Seconds() {
+				if seconds > 0 {
+					b.steps[i].started = true
+				}
+				end := time.Since(b.steps[i].endTime).Seconds()
+				if end > 0 {
 					b.steps[i].executed = true
 				}
-				fmt.Println("SEconds: ", b.steps[i].started, b.steps[i].startTime, b.steps[i].Duration.Seconds(), seconds)
-				if !b.steps[i].executed && seconds > b.steps[i].Duration.Seconds() {
+				if !b.steps[i].executed {
 					b.steps[i].Execute()
 				}
 				continue
