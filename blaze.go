@@ -117,7 +117,7 @@ func (b *Blaze) Do() error {
 		return err
 	}
 	fmt.Println(b.steps)
-	startTime := time.Now()
+	//startTime := time.Now()
 	ticker := time.NewTicker(b.tickEvery)
 	go func() {
 		for t := range ticker.C {
@@ -125,8 +125,9 @@ func (b *Blaze) Do() error {
 				fmt.Println(t, s)
 				if !s.started {
 					s.started = true
+					s.startTime = time.Now()
 				}
-				seconds := time.Since(startTime).Seconds()
+				seconds := time.Since(s.startTime).Seconds()
 				if !s.executed && seconds > s.Duration.Seconds() {
 					s.Execute()
 					b.steps[i].updateExecuted()
