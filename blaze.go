@@ -126,6 +126,7 @@ func (b *Blaze) Do() error {
 					s.Execute()
 					b.steps[i].updateExecuted()
 				}
+				break
 			}
 			b.mainExec()
 		}
