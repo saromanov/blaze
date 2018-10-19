@@ -54,6 +54,7 @@ type step struct {
 	executed bool
 	m        *sync.RWMutex
 	order    int
+	started  bool
 }
 
 func (s *step) updateExecuted() {
