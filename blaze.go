@@ -126,20 +126,24 @@ func (b *Blaze) Do() error {
 	ticker := time.NewTicker(b.tickEvery)
 	go func() {
 		for t := range ticker.C {
-			for i, s := range b.steps {
-				fmt.Println("STEP:", t, s, b.steps[i].started)
-				seconds := time.Since(b.steps[i].startTime).Seconds()
-				if seconds > 0 {
-					b.steps[i].started = true
-				}
-				end := time.Since(b.steps[i].endTime).Seconds()
-				if end > 0 {
-					b.steps[i].executed = true
-				}
-				if !b.steps[i].executed {
-					b.steps[i].Execute()
-				}
+			step, i := b.getStep()
+			if step.executed {
 				continue
+			}
+			if b.steps[i].executed {
+				continue
+			}
+			fmt.Println("STEP:", t, b.steps[i].started)
+			seconds := time.Since(b.steps[i].startTime).Seconds()
+			if seconds > 0 {
+				b.steps[i].started = true
+			}
+			end := time.Since(b.steps[i].endTime).Seconds()
+			if end > 0 {
+				b.steps[i].executed = true
+			}
+			if !b.steps[i].executed {
+				b.steps[i].Execute()
 			}
 			b.mainExec()
 		}
@@ -147,6 +151,16 @@ func (b *Blaze) Do() error {
 	time.Sleep(b.duration)
 	ticker.Stop()
 	return nil
+}
+
+// getStep returns first not executed step
+func (b *Blaze) getStep() (step, int) {
+	for i, s := range b.steps {
+		if !s.executed {
+			return s, i
+		}
+	}
+	return step{}, 0
 }
 
 // checkConfig provides checking of required
