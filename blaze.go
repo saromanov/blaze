@@ -128,12 +128,15 @@ func (b *Blaze) Do() error {
 					b.steps[i].startTime = time.Now()
 				}
 				seconds := time.Since(s.startTime).Seconds()
-				fmt.Println("SEconds: ", s.started, s.startTime, seconds)
+				if seconds > s.Duration.Seconds() {
+					b.steps[i].executed = true
+				}
+				fmt.Println("SEconds: ", s.started, s.startTime, s.Duration.Seconds() < seconds)
 				if !s.executed && seconds > s.Duration.Seconds() {
 					s.Execute()
 					b.steps[i].updateExecuted()
 				}
-				break
+				continue
 			}
 			b.mainExec()
 		}
